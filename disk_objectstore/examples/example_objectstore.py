@@ -14,7 +14,7 @@ from disk_objectstore import Container
 
 
 @click.command(
-    context_settings=dict(show_default=True)  # pylint: disable=use-dict-literal
+    context_settings=dict(show_default=True)
 )
 @click.option('-n', '--num-files', default=100, help='Number of files to create.')
 @click.option('-m', '--min-size', default=0, help='Minimum file size (bytes).')
@@ -58,7 +58,6 @@ def main(
     profile_file,
 ):
     """Testing some basic functionality of the object-store, with timing."""
-    # pylint: disable=too-many-arguments,too-many-locals,too-many-statements,too-many-branches
 
     container = Container(path)
     if clear:
@@ -155,7 +154,7 @@ def main(
 
         # Check that all loose files are gone
         counts = container.count_objects()
-        loose_folder = container._get_loose_folder()  # pylint: disable=protected-access
+        loose_folder = container._get_loose_folder()
         assert not counts['loose'], 'loose objects left: ' f'{os.listdir(loose_folder)}'
         ## I cannot do this because I could have overlap if the object is identical and has the same hash key
         # assert counts['packed'] == start_counts['packed'] + start_counts[
@@ -251,4 +250,4 @@ def main(
 
 
 if __name__ == '__main__':
-    main()  # pylint: disable=no-value-for-parameter
+    main()

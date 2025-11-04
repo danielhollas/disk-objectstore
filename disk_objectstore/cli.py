@@ -89,7 +89,7 @@ def validate(dostore: ContainerContext, verbose: bool):
 
     try:
         # Import here so I don't have to depend on this library
-        import tqdm  # pylint: disable=import-outside-toplevel
+        import tqdm
 
         class CallbackTqdm:
             """Provides a callback to show a progress bar with TQDM."""

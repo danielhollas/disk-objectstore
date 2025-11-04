@@ -4,7 +4,6 @@ Some might be useful also for end users, like the wrappers to get streams,
 like the ``LazyOpener``.
 """
 
-#  pylint: disable= too-many-lines
 from __future__ import annotations
 
 import abc
@@ -79,7 +78,7 @@ class CompressMode(Enum):
     """
 
     # Never compress
-    NO = 'no'  # pylint: disable=invalid-name
+    NO = 'no'
     # Always recompress
     YES = 'yes'
     # Keep the current compression when repacking.
@@ -230,7 +229,7 @@ class LazyLooseStream:
 
         Note that when called this might uncompress the whole file, if not already done.
         """
-        MAX_RETRIES = 3  # pylint: disable=invalid-name
+        MAX_RETRIES = 3
         if not self.closed:
             # Already open, just return
             return
@@ -239,9 +238,7 @@ class LazyLooseStream:
         while True:
             loose_path = self._container.loosen_object(self._hashkey)
             try:
-                self._stream = open(  # pylint: disable=consider-using-with
-                    loose_path, mode='rb'
-                )
+                self._stream = open(loose_path, mode='rb')
                 # I could open the stream, exit the infinite loop
                 break
             except FileNotFoundError as exc:
@@ -278,10 +275,10 @@ def nullcontext(enter_result: Any) -> Iterator[Any]:
     yield enter_result
 
 
-class ObjectWriter:  # pylint: disable=too-many-instance-attributes
+class ObjectWriter:
     """A class to get direct write access for a new object."""
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         sandbox_folder: Path,
         loose_folder: Path,
@@ -342,9 +339,7 @@ class ObjectWriter:  # pylint: disable=too-many-instance-attributes
         self._filehandle = HashWriterWrapper(open(self._obj_path, 'wb'), hash_type=self.hash_type)
         return self._filehandle
 
-    def __exit__(  # pylint: disable=too-many-branches, too-many-statements
-        self, exc_type: Any, value: Any, traceback: Any
-    ) -> None:
+    def __exit__(self, exc_type: Any, value: Any, traceback: Any) -> None:
         """
         Close the file object, and move it from the sandbox to the loose
         object folder, possibly using sharding if loose_prexix_len is not 0.
@@ -1082,7 +1077,6 @@ def _get_compression_algorithm_info(algorithm: str):
     try:
         algorithm_info = known_algorithms[algorithm_name]
     except KeyError:
-        # pylint: disable=raise-missing-from)
         raise ValueError(f"Unknown or unsupported compression algorithm '{algorithm_name}'")
     try:
         kwargs = {
@@ -1090,7 +1084,6 @@ def _get_compression_algorithm_info(algorithm: str):
         }
         compresser = algorithm_info['compressobj'](**kwargs)  # type: ignore
     except KeyError:
-        # pylint: disable=raise-missing-from
         raise ValueError(f"Invalid variant '{variant}' for compression algorithm '{algorithm_name}'")
 
     decompresser = algorithm_info['decompresser']
@@ -1176,7 +1169,6 @@ def get_hash_cls(hash_type: str) -> Callable:
     try:
         return known_hashes[hash_type]
     except KeyError:
-        # pylint: disable=raise-missing-from
         raise ValueError(f"Unknown or unsupported hash type '{hash_type}'")
 
 
@@ -1319,9 +1311,7 @@ def safe_flush_to_disk(
     fhandle.flush()
 
     # Default fsync function, replaced on Mac OS X
-    _fsync_function: Callable[[Any], Any] = lambda fileno: os.fsync(  # pylint: disable=unnecessary-lambda
-        fileno
-    )
+    _fsync_function: Callable[[Any], Any] = lambda fileno: os.fsync(fileno)
 
     # Flush to disk
     if hasattr(fcntl, 'F_FULLFSYNC') is not None and (_MACOS_ALWAYS_USE_FULLSYNC or use_fullsync):
@@ -1336,7 +1326,7 @@ def safe_flush_to_disk(
         # > should use F_FULLFSYNC to ensure that their data is written in the order
         # > they expect.  Please see fcntl(2) for more detail.
         # Replace the _fsync_function
-        _fsync_function = lambda fileno: fcntl.fcntl(  # pylint: disable=unnecessary-lambda-assignment
+        _fsync_function = lambda fileno: fcntl.fcntl(
             fileno,
             F_FULLFSYNC,
         )
@@ -1379,7 +1369,7 @@ def compute_hash_and_size(
     return hasher.hexdigest(), size
 
 
-def detect_where_sorted(  # pylint: disable=too-many-branches, too-many-statements
+def detect_where_sorted(
     left_iterator: Iterable[Any],
     right_iterator: Iterable[Any],
     left_key: Callable | None = None,
@@ -1409,7 +1399,7 @@ def detect_where_sorted(  # pylint: disable=too-many-branches, too-many-statemen
     right_exhausted = False
 
     if left_key is None:
-        left_key = lambda x: x  # pylint: disable=unnecessary-lambda-assignment
+        left_key = lambda x: x
 
     # Convert first in iterators (in case they are, e.g., lists)
     left_iterator = iter(left_iterator)

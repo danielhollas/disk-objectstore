@@ -5,7 +5,6 @@ This checks the performance (can be run with profiling as well) and can be used 
 that in streaming mode, even when dealing with very large data, the memory usage is always
 limited."""
 
-# pylint: disable=too-many-arguments
 import dataclasses
 import time
 
@@ -188,4 +187,4 @@ def main(size_gb, path, clear, check_memory_measurement, with_line_profiler, com
 
 
 if __name__ == '__main__':
-    main()  # pylint: disable=no-value-for-parameter
+    main()

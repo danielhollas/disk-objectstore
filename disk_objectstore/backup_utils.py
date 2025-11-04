@@ -129,7 +129,7 @@ class BackupManager:
             return int(match.group(1).split('.')[0])
         return None
 
-    def call_rsync(  # pylint: disable=too-many-arguments,too-many-branches
+    def call_rsync(
         self,
         src: Path,
         dest: Path,
@@ -336,9 +336,9 @@ def backup_container(
     """
 
     container_root_path = container.get_folder()
-    loose_path = container._get_loose_folder()  # pylint: disable=protected-access
-    packs_path = container._get_pack_folder()  # pylint: disable=protected-access
-    sqlite_path = container._get_pack_index_path()  # pylint: disable=protected-access
+    loose_path = container._get_loose_folder()
+    packs_path = container._get_pack_folder()
+    sqlite_path = container._get_pack_index_path()
 
     # step 1: back up loose files
     loose_path_rel = loose_path.relative_to(container_root_path)

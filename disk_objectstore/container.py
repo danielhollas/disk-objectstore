@@ -4,7 +4,6 @@ The main implementation of the ``Container`` class of the object store.
 
 from __future__ import annotations
 
-# pylint: disable=too-many-lines
 import dataclasses
 import io
 import json
@@ -71,7 +70,7 @@ class ObjectType(Enum):
     MISSING = 'missing'
 
 
-class Container:  # pylint: disable=too-many-public-methods
+class Container:
     """A class representing a container of objects (which is stored on a disk folder)"""
 
     _PACK_INDEX_SUFFIX = '.idx'
@@ -495,7 +494,7 @@ class Container:  # pylint: disable=too-many-public-methods
                 obj_hashkey,
                 stream,
                 meta,
-            ) in triplets:  # pylint: disable=not-an-iterable
+            ) in triplets:
                 counter += 1
                 assert counter == 1, 'There is more than one item returned by get_objects_stream_and_meta'
                 assert obj_hashkey == hashkey
@@ -521,7 +520,7 @@ class Container:  # pylint: disable=too-many-public-methods
         with_streams: Literal[True],
     ) -> Iterator[tuple[str, StreamSeekBytesType | None, ObjectMeta]]: ...
 
-    def _get_objects_stream_meta_generator(  # pylint: disable=too-many-branches,too-many-statements,too-many-locals
+    def _get_objects_stream_meta_generator(
         self,
         hashkeys: Iterable[str],
         skip_if_missing: bool,
@@ -545,7 +544,6 @@ class Container:  # pylint: disable=too-many-public-methods
         :param with_streams: if True, yield triplets (hashkey, stream, meta).
             If False, yield pairs (hashkey, meta) and avoid to open any file.
         """
-        # pylint: disable=too-many-nested-blocks
 
         # During the run, this variable is updated with the currently open file.
         # This file is closed before opening a new one - so we ensure only one is
@@ -600,9 +598,7 @@ class Container:  # pylint: disable=too-many-public-methods
             try:
                 # Open only once per file (if in `with_streams` mode)
                 if with_streams:
-                    last_open_file = open(  # pylint: disable=consider-using-with
-                        pack_path, mode='rb'
-                    )
+                    last_open_file = open(pack_path, mode='rb')
                 for metadata in pack_metadata:
                     meta = {
                         'type': ObjectType.PACKED,
@@ -650,9 +646,7 @@ class Container:  # pylint: disable=too-many-public-methods
             obj_path = self._get_loose_path_from_hashkey(hashkey=loose_hashkey)
             try:
                 if with_streams:
-                    last_open_file = open(  # pylint: disable=consider-using-with
-                        obj_path, mode='rb'
-                    )
+                    last_open_file = open(obj_path, mode='rb')
                     # I do not use Pathlib to get the size, in case the file has just
                     # been deleted by a concurrent writer, but I use the lower-level os.fstat
                     # on the fileno() of the open file
@@ -741,9 +735,7 @@ class Container:  # pylint: disable=too-many-public-methods
                 pack_path = self._get_pack_path_from_pack_id(str(pack_int_id))
                 try:
                     if with_streams:
-                        last_open_file = open(  # pylint: disable=consider-using-with
-                            pack_path, mode='rb'
-                        )
+                        last_open_file = open(pack_path, mode='rb')
 
                     for metadata in pack_metadata:
                         meta = {
@@ -894,9 +886,7 @@ class Container:  # pylint: disable=too-many-public-methods
         for (
             obj_hashkey,
             meta,
-        ) in self.get_objects_meta(  # pylint: disable=not-an-iterable
-            hashkeys=[hashkey], skip_if_missing=False
-        ):
+        ) in self.get_objects_meta(hashkeys=[hashkey], skip_if_missing=False):
             counter += 1
             assert counter == 1, 'There is more than one item returned by get_objects_stream_and_meta'
             assert obj_hashkey == hashkey
@@ -917,9 +907,7 @@ class Container:  # pylint: disable=too-many-public-methods
         existing_hashkeys = set()
 
         # Note: This iterates in a 'random' order, different than the `hashkeys` list
-        for obj_hashkey, _ in self.get_objects_meta(  # pylint: disable=not-an-iterable
-            hashkeys=hashkeys, skip_if_missing=True
-        ):
+        for obj_hashkey, _ in self.get_objects_meta(hashkeys=hashkeys, skip_if_missing=True):
             # Since I use skip_if_missing=True, I should only iterate on those that exist
             existing_hashkeys.add(obj_hashkey)
 
@@ -947,7 +935,7 @@ class Container:  # pylint: disable=too-many-public-methods
         """
         retrieved: dict[str, bytes | None] = {}
         with self.get_objects_stream_and_meta(hashkeys=hashkeys, skip_if_missing=skip_if_missing) as triplets:
-            for obj_hashkey, stream, _ in triplets:  # pylint: disable=not-an-iterable
+            for obj_hashkey, stream, _ in triplets:
                 if stream is None:
                     # This should happen only if skip_if_missing is False
                     retrieved[obj_hashkey] = None
@@ -1244,7 +1232,7 @@ class Container:  # pylint: disable=too-many-public-methods
 
         return (count_read_bytes, hasher.hexdigest() if hash_type else None)
 
-    def pack_all_loose(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+    def pack_all_loose(
         self,
         compress: bool | CompressMode = CompressMode.NO,
         validate_objects: bool = True,
@@ -1427,7 +1415,7 @@ class Container:  # pylint: disable=too-many-public-methods
                     # Because I'm already checking the hash keys and avoiding to add twice the same
                     session.execute(
                         Obj.__table__.insert(),
-                        obj_dicts,  # pylint: disable=no-member
+                        obj_dicts,
                     )
                     # Clean up the list - this will be cleaned up also later,
                     # but it's better to make sure that we do it here, to avoid trying to rewrite
@@ -1460,7 +1448,7 @@ class Container:  # pylint: disable=too-many-public-methods
         if callback:
             callback('close', None)
 
-    def add_streamed_object_to_pack(  # pylint: disable=too-many-arguments
+    def add_streamed_object_to_pack(
         self,
         stream: StreamSeekBytesType,
         compress: bool = False,
@@ -1502,7 +1490,7 @@ class Container:  # pylint: disable=too-many-public-methods
 
         return retval[0]
 
-    def add_streamed_objects_to_pack(  # pylint: disable=too-many-locals, too-many-branches, too-many-statements, too-many-arguments
+    def add_streamed_objects_to_pack(
         self,
         stream_list: list[StreamSeekBytesType] | list[LazyOpener],
         compress: bool = False,
@@ -1755,9 +1743,7 @@ class Container:  # pylint: disable=too-many-public-methods
                 # It's now time to write to the DB, in a single bulk operation (per pack)
                 if obj_dicts:
                     session.execute(
-                        Obj.__table__.insert().prefix_with(  # pylint: disable=no-member
-                            'OR IGNORE'
-                        ),
+                        Obj.__table__.insert().prefix_with('OR IGNORE'),
                         obj_dicts,
                     )
                     # Clean up the list - this will be cleaned up also later,
@@ -1792,7 +1778,7 @@ class Container:  # pylint: disable=too-many-public-methods
 
         return hashkeys
 
-    def add_objects_to_pack(  # pylint: disable=too-many-arguments
+    def add_objects_to_pack(
         self,
         content_list: list[bytes] | tuple[bytes, ...],
         compress: bool = False,
@@ -1898,9 +1884,7 @@ class Container:  # pylint: disable=too-many-public-methods
         # ensure sqlalchemy knows to open a new transaction for the next execution
         session.commit()
 
-    def clean_storage(  # pylint: disable=too-many-branches,too-many-locals
-        self, vacuum: bool = False
-    ) -> None:
+    def clean_storage(self, vacuum: bool = False) -> None:
         """Perform some clean-up of the container.
 
         .. note:: this is an operation that should be run only by one process at a given time! Don't call it twice.
@@ -1931,7 +1915,6 @@ class Container:  # pylint: disable=too-many-public-methods
                 with self.get_object_stream(reference_obj_hashkey) as stream:
                     computed_hash, _ = compute_hash_and_size(stream, self.hash_type)
             except NotExistent:
-                # pylint: disable=raise-missing-from
                 # The object is not in the repository. It has probably been deleted and for some
                 # reason the duplicates have not been cleaned. I raise: this might have appened for instance
                 # because two processes tried to write, the first locked, the second gave up and created a
@@ -2010,7 +1993,7 @@ class Container:  # pylint: disable=too-many-public-methods
                 # I just ignore, I will remove it in a future call of this method.
                 pass
 
-    def import_objects(  # pylint: disable=too-many-locals,too-many-statements,too-many-branches,too-many-arguments
+    def import_objects(
         self,
         hashkeys: Iterable[str],
         source_container: Container,
@@ -2235,7 +2218,7 @@ class Container:  # pylint: disable=too-many-public-methods
         return old_new_obj_hashkey_mapping
 
     # Let us also compute the hash
-    def _validate_hashkeys_pack(  # pylint: disable=too-many-locals
+    def _validate_hashkeys_pack(
         self, pack_id: int, callback: Callable | None = None
     ) -> dict[str, list[str | Any] | list[Any]]:
         """Validate all hashkeys and returns a dictionary of problematic entries.
@@ -2299,7 +2282,6 @@ class Container:  # pylint: disable=too-many-public-methods
             callback_tqdm = CallbackTqdm()
             container.validate(callback=callback_tqdm.callback)
         """
-        # pylint: disable=too-many-locals
         # Will contain hashkeys of invalid objects
         invalid_hashes = []
         invalid_sizes = []
@@ -2521,7 +2503,7 @@ class Container:  # pylint: disable=too-many-public-methods
             self.repack_pack(pack_id, compress_mode=compress_mode, callback=callback)
         self._vacuum()
 
-    def repack_pack(  # pylint: disable=too-many-branches,too-many-statements,too-many-locals
+    def repack_pack(
         self,
         pack_id: str,
         compress_mode: CompressMode = CompressMode.KEEP,

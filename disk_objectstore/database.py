@@ -7,15 +7,15 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.expression import text
 
-Base = declarative_base()  # pylint: disable=invalid-name,useless-suppression
+Base = declarative_base()
 
 
-class Obj(Base):  # pylint: disable=too-few-public-methods
+class Obj(Base):
     """The main (and only) table to store object metadata (hashkey, offset, length, ...)."""
 
     __tablename__ = 'db_object'
 
-    id = Column(Integer, primary_key=True)  # pylint: disable=invalid-name
+    id = Column(Integer, primary_key=True)
 
     # Important: there are parts of the code that rely on the fact that this field is unique.
     # If you really do not want a uniqueness field, you will need to adapt the code.
@@ -63,7 +63,7 @@ def get_session(path: Path, create: bool = False) -> Session:
     # For this binding, see background on
     # https://docs.sqlalchemy.org/en/13/dialects/sqlite.html#serializable-isolation-savepoints-transactional-ddl
     @event.listens_for(engine, 'begin')
-    def do_begin(conn):  # pylint: disable=unused-variable
+    def do_begin(conn):
         # emit our own BEGIN
         conn.execute(text('BEGIN'))
 
