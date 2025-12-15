@@ -1975,7 +1975,6 @@ class Container:  # pylint: disable=too-many-public-methods
                 with self.get_object_stream(reference_obj_hashkey) as stream:
                     computed_hash, _ = compute_hash_and_size(stream, self.hash_type)
             except NotExistent:
-                # pylint: disable=raise-missing-from
                 # The object is not in the repository. It has probably been deleted and for some
                 # reason the duplicates have not been cleaned. I raise: this might have appened for instance
                 # because two processes tried to write, the first locked, the second gave up and created a
@@ -1987,7 +1986,7 @@ class Container:  # pylint: disable=too-many-public-methods
                     'that however does not exist anymore. '
                     "If you don't need it, use `delete_objects()` passing this hash key to clean up the repository, "
                     'or attempt a manual recovery of the duplicate'
-                )
+                ) from None
 
             if computed_hash == reference_obj_hashkey:
                 # The object is in the repo and has the correct hashkey: we just remove all duplicates

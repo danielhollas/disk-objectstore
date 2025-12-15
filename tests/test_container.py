@@ -654,9 +654,9 @@ def test_initialisation(temp_dir):
     assert not container.is_initialised
 
     with pytest.raises(exc.NotInitialised):
-        container.loose_prefix_len  # pylint: disable=pointless-statement
+        container.loose_prefix_len  # noqa: B018
     with pytest.raises(exc.NotInitialised):
-        container.pack_size_target  # pylint: disable=pointless-statement
+        container.pack_size_target  # noqa: B018
 
     # Check that the session cannot be obtained before initialising
     with pytest.raises(FileNotFoundError):

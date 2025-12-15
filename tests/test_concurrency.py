@@ -179,7 +179,8 @@ def test_concurrency_with_clean_loose_per_pack(temp_dir, max_size, clean_loose_p
 
     # Start workers (they write AND read)
     worker_procs = []
-    for worker_id in range(2):
+    num_workers = 2
+    for _ in range(num_workers):
         options = [
             '-r',
             '5',

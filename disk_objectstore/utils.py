@@ -921,6 +921,7 @@ class ZlibLikeBaseStreamDecompresser(abc.ABC):
         """Use as context manager."""
         return self
 
+    @abc.abstractmethod
     def __exit__(self, exc_type, value, traceback) -> None:
         """Close context manager."""
 
@@ -1080,16 +1081,14 @@ def _get_compression_algorithm_info(algorithm: str):
     try:
         algorithm_info = known_algorithms[algorithm_name]
     except KeyError:
-        # pylint: disable=raise-missing-from)
-        raise ValueError(f"Unknown or unsupported compression algorithm '{algorithm_name}'")
+        raise ValueError(f"Unknown or unsupported compression algorithm '{algorithm_name}'") from None
     try:
         kwargs = {
             algorithm_info['variant_name']: algorithm_info['variant_mapper'][variant]  # type: ignore
         }
         compresser = algorithm_info['compressobj'](**kwargs)  # type: ignore
     except KeyError:
-        # pylint: disable=raise-missing-from
-        raise ValueError(f"Invalid variant '{variant}' for compression algorithm '{algorithm_name}'")
+        raise ValueError(f"Invalid variant '{variant}' for compression algorithm '{algorithm_name}'") from None
 
     decompresser = algorithm_info['decompresser']
 
@@ -1174,8 +1173,7 @@ def get_hash_cls(hash_type: str) -> Callable:
     try:
         return known_hashes[hash_type]
     except KeyError:
-        # pylint: disable=raise-missing-from
-        raise ValueError(f"Unknown or unsupported hash type '{hash_type}'")
+        raise ValueError(f"Unknown or unsupported hash type '{hash_type}'") from None
 
 
 def _compute_hash_for_file(filepath: Path, hash_type: str) -> str | None:
